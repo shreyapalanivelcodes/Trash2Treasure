@@ -1,55 +1,45 @@
 Trash2Treasure
 
-Trash2Treasure is a web application that promotes eco-awareness by allowing users to upload, classify, and track waste. It encourages sustainable behavior through eco-tips, gamification ideas, and a global leaderboard.
+Trash2Treasure is a web application that promotes eco-awareness by allowing users to upload, classify, and track waste. It encourages sustainable behavior through eco-tips, leaderboards, and community engagement.
 
-Features Implemented
+Features ab tak (Implemented Features)
 
-- User Management
-  - New users can sign up.
-  - Existing users can log in and log out.
+- Nice UI
+- New User - Signup
+- Old User - Login
+- Eco Tips on every web page
+- Upload Waste and Classify
+- Leaderboard (globally/organization wise)
+- Previously loaded items
+- Logout Button
 
-- User Interface
-  - Clean, modern UI.
-  - Eco tips displayed on every page for awareness.
+Pending Features :
 
-- Waste Handling
-  - Users can upload waste and classify it.
-  - View previously uploaded items.
+- Nearest dumping organization
+- Owner Contact & Feedback & Customer Support
 
-- Leaderboard
-  - Global and organization-wise rankings.
+New Features May Be (Future Ideas)
 
-- Session Management
-  - Logged-in users are remembered using local storage.
+- Auto Suggestions: After classifying waste, suggest ways to reuse or recycle it.
+- Waste Diary / Stats: Track user’s contribution over time with charts (kg of plastic saved, trees saved, etc.).
 
-Planned Features
+Social & Community Features
+- Friends & Followers: Let users follow each other and see their activity feed.
+- Comments & Reactions: Users can comment on uploads or achievements.
+- Community Goals: Show progress toward shared targets like “100 kg plastic recycled this month.”
 
-- Community Engagement
-  - Follow friends, comment, track community goals.
+Leaderboard Upgrade
+- Add filters like “Monthly Top Contributor” or “Most Impactful Uploads.”
 
-- Advanced Features
-  - Nearby recycling center map.
-  - Personal eco-impact statistics.
+Custom Profile
+- Users can upload an avatar and bio highlighting their eco-contributions.
 
-
-//to be included later : Include screenshots or GIFs here showing the UI and features.
-
-Tech Stack
-
-- Frontend: HTML, CSS, JavaScript
-- Libraries: Optional AI classification library (TensorFlow.js)
-- Storage: LocalStorage for session management
-
-How to Run
-
-1. Clone the repository:
-   git clone https://github.com/yourusername/Trash2Treasure.git
-2. Open index.html in your browser.
-3. Start exploring the features.
+Cross-Platform / Sharing
+- Share Your Impact: Users can share achievements or leaderboard rank on social media.
+- Invite Friends: Incentivize referrals with points or badges.
 
 Contact
 
 Shreya Palanivel
 Email: shreyapalanivel2729@gmail.com
-LinkedIn: https://www.linkedin.com/in/shreyapalanivel2729/
 GitHub: https://github.com/shreyapalanivelcodes
