@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trash2Treasure - Results</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Popup Idea Box -->
+<div id="tipPopup" class="popup">
+  <div class="popup-content">
+    <span id="closePopup">&times;</span>
+    <p id="popupMessage">💡 Tip: Reduce plastic waste by carrying a reusable bag!</p>
+  </div>
+</div>
+
+<script>
+  // Show popup after a delay
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("tipPopup").style.display = "block";
+    }, 1500); // show after 1.5 sec
+  });
+
+  // Close button
+  document.getElementById("closePopup").addEventListener("click", () => {
+    document.getElementById("tipPopup").style.display = "none";
+  });
+</script>
+
+<!-- ==================== Header ==================== -->
+<header>
+  <h1>♻️ Trash2Treasure</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="upload.html">Upload Waste</a>
+    <a href="items.html">Items</a>
+    <a href="leaderboard.html">Leaderboard</a>
+  </nav>
+</header>
+
+<!-- ==================== Main Content ==================== -->
+<main>
+  <h2>Classification Result 🌱</h2>
+
+  <!-- Display uploaded image -->
+  <div id="uploadedImage"></div>
+
+  <!-- Display detected waste type -->
+  <p id="detectedWaste"></p>
+
+  <!-- Container for nearest recycling centers -->
+  <div id="recyclingCenters"></div>
+</main>
+
+<!-- ==================== Tip Pop-up ==================== -->
+<div id="tipPopup" class="tip-popup"></div>
+
+<!-- ==================== JS Scripts ==================== -->
+<script src="js/tips.js"></script>
+<script src="js/classifier.js"></script>
+
+<script>
+  // Assume image and prediction info are passed via localStorage
+  const imageSrc = localStorage.getItem("uploadedImage");
+  const wasteType = localStorage.getItem("detectedWaste");
+
+  const uploadedImageDiv = document.getElementById("uploadedImage");
+  const detectedWaste = document.getElementById("detectedWaste");
+
+  if(imageSrc && wasteType){
+    const img = document.createElement("img");
+    img.src = imageSrc;
+    img.alt = "Uploaded Waste Image";
+    img.style.maxWidth = "300px";
+    uploadedImageDiv.appendChild(img);
+
+    detectedWaste.textContent = `Detected: ${wasteType} ✅`;
+
+    // Get user's location
+    navigator.geolocation.getCurrentPosition(position => {
+      const userLat = position.coords.latitude;
+      const userLng = position.coords.longitude;
+      showNearestRecyclingCenters(wasteType, userLat, userLng);
+    }, err => {
+      console.error(err);
+      document.getElementById("recyclingCenters").innerHTML = "<p>Cannot fetch your location. Enable location services 🌱</p>";
+    });
+
+  } else {
+    detectedWaste.textContent = "No classification data found. Please upload an image first.";
+  }
+</script>
+
+</body>
+</html>

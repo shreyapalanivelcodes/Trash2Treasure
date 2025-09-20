@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Trash2Treasure</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Page-specific styles */
+        body {
+            padding-top: 70px;
+        }
+
+        header {
+            background: rgba(46, 60, 46, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #d6e8c3;
+        }
+
+        nav#navbar a.main-btn,
+        .logout-btn {
+            color: #1b2a1b !important;
+            background: #81c784;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        nav#navbar a.main-btn:hover,
+        .logout-btn:hover {
+            background: #66bb6a;
+            transform: scale(1.05);
+        }
+
+        nav#navbar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #4f8c4f;
+            padding-bottom: 5px;
+        }
+
+        /* ===== Gallery Grid (Side-by-side layout) ===== */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            background: #3a4f3a;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+            max-width: 250px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .item-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .categories {
+            margin-top: 5px;
+        }
+
+        .categories span {
+            display: inline-block;
+            background: #4f8c4f;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .container {
+            background: rgba(46, 60, 46, 0.9);
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
+        }
+
+        @media (max-width: 768px) {
+            .items-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= Header ================= -->
+    <header>
+        <h1>♻️ Trash2Treasure</h1>
+        <nav id="navbar">
+            <a href="index.html" class="main-btn">Home</a>
+            <a href="leaderboard.html" class="main-btn">Leaderboard</a>
+            <a href="upload.html" class="main-btn">Upload Waste</a>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </nav>
+    </header>
+
+    <!-- ================= Main Content ================= -->
+    <main>
+        <!-- Profile Info -->
+        <section class="container" id="profileInfo">
+            <h2>Profile Info</h2>
+            <p><strong>Name:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+        </section>
+
+        <!-- Uploaded Items -->
+        <section class="container">
+            <h2>Your Uploaded Items 🌱</h2>
+            <div id="userItems" class="items-grid"></div>
+        </section>
+    </main>
+
+    <!-- ================= Tips Popup ================= -->
+    <div id="tipPopup"></div>
+
+    <!-- ================= Footer ================= -->
+    <footer>
+        <p>© 2025 Trash2Treasure | Building a sustainable future ♻️</p>
+    </footer>
+
+    <!-- ================= Scripts ================= -->
+    <script src="/js/tips.js"></script>
+    <script>
+        // ===== USER INFO & LOGOUT =====
+        const token = localStorage.getItem("token");
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (!token || !user) {
+            window.location.href = "login.html";
+        } else {
+            document.getElementById("userName").textContent = user.name;
+            document.getElementById("userEmail").textContent = user.email || "N/A";
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        });
+
+        // ===== Load Uploaded Items =====
+        async function loadUserItems() {
+            const container = document.getElementById("userItems");
+            container.innerHTML = "<p>Loading...</p>";
+
+            try {
+                const res = await fetch("/api/items/user", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.status === 401) return window.location.href = "login.html";
+                if (!res.ok) throw new Error("Failed to fetch");
+
+                const items = await res.json();
+                container.innerHTML = "";
+                if (!Array.isArray(items) || !items.length) {
+                    container.innerHTML = "<p>No uploads yet 🌱</p>";
+                    return;
+                }
+
+                items.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "item-card";
+
+                    // Image
+                    const img = document.createElement("img");
+                    img.src = item.filename
+                        ? `/uploads/${item.filename}`
+                        : "https://placehold.co/250x180/4f8c4f/ffffff?text=No+Image";
+
+                    // Type
+                    const title = document.createElement("h4");
+                    title.textContent = item.type || "Unknown";
+
+                    // Categories
+                    const categories = document.createElement("div");
+                    categories.className = "categories";
+                    if (item.topCategories && item.topCategories.length) {
+                        item.topCategories.forEach(cat => {
+                            const name = cat.name || cat.className || "Unknown";
+                            const perc = (cat.percentage !== undefined)
+                                ? cat.percentage
+                                : (cat.probability !== undefined ? (cat.probability * 100).toFixed(1) : "0");
+                            const span = document.createElement("span");
+                            span.textContent = `${name} - ${perc}%`;
+                            categories.appendChild(span);
+                        });
+                    }
+
+                    card.appendChild(img);
+                    card.appendChild(title);
+                    card.appendChild(categories);
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = "<p>Error loading items ❌</p>";
+            }
+        }
+
+        loadUserItems();
+    </script>
+
+</body>
+</html>

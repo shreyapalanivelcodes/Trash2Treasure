@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trash2Treasure - Login</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* Fixes scrollbar issue and centers content on the page */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  max-height: none;
+  overflow-y: visible;
+  background: none;
+  box-shadow: none;
+}
+  
+.auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #2e3c2e;
+  padding: 35px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+.auth-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #d6e8c3;
+}
+.auth-container input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #5c805c;
+  background: #1f2d1f;
+  color: #e0e6d4;
+  transition: all 0.3s ease;
+}
+.auth-container input:focus {
+  outline: none;
+  border-color: #a5d6a7;
+  box-shadow: 0 0 8px rgba(165,214,167,0.4);
+}
+.auth-container button {
+  width: 100%;
+  padding: 12px;
+  background: #81c784;
+  color: #1b2a1b;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.auth-container button:hover {
+  background: #66bb6a;
+  transform: scale(1.03);
+}
+.auth-container p {
+  text-align: center;
+  margin-top: 15px;
+}
+.auth-container .link {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #3a5c3a;
+  color: #e0e6d4;
+  transition: all 0.3s ease;
+}
+.auth-container .link:hover {
+  background: #4f8c4f;
+}
+
+/* Corrected responsive styles for the tip popup */
+@media (max-width: 768px) {
+  #tipPopup {
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>♻️ Trash2Treasure</h1>
+<nav id="navbar">
+  <a href="index.html" class="main-btn">Home</a>
+  <a href="leaderboard.html" class="main-btn">Leaderboard</a>
+  <a href="profile.html" class="main-btn profile-btn" style="display:none;">My Profile</a>
+  <a href="login.html" class="main-btn login-btn">Login</a>
+  <a href="signup.html" class="main-btn signup-btn">Signup</a>
+  <button class="logout-btn" style="display:none;">Logout</button>
+</nav>
+</header>
+
+<main>
+<div class="auth-container">
+  <h1>Login</h1>
+  <form id="loginForm">
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button type="submit">Login</button>
+  </form>
+  <p>Don't have an account? <a href="signup.html" class="link">Signup</a></p>
+</div>
+</main>
+
+<footer>
+<p>© 2025 Trash2Treasure | Building a sustainable future ♻️</p>
+</footer>
+
+<!-- This element is required for the tips.js script -->
+<div id="tipPopup"></div>
+
+<script src="js/tips.js"></script>
+<script>
+// Navbar and logout logic
+const logoutBtn = document.querySelector(".logout-btn");
+const loginNav = document.querySelector(".login-btn");
+const signupNav = document.querySelector(".signup-btn");
+const profileNav = document.querySelector(".profile-btn");
+
+function updateNavbar() {
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
+if (user && token) {
+  logoutBtn.style.display = "block";
+  loginNav.style.display = "none";
+  signupNav.style.display = "none";
+  profileNav.style.display = "block";
+  profileNav.textContent = `My Profile (${user.name})`;
+} else {
+  logoutBtn.style.display = "none";
+  loginNav.style.display = "block";
+  signupNav.style.display = "block";
+  profileNav.style.display = "none";
+}
+}
+updateNavbar();
+
+logoutBtn.addEventListener("click", () => {
+localStorage.removeItem("token");
+localStorage.removeItem("user");
+updateNavbar();
+window.location.href = "login.html";
+});
+
+// Corrected Login Logic to use the backend API
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+e.preventDefault();
+
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+
+try {
+  const response = await fetch("http://localhost:5000/api/auth/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ email, password }),
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+  // Login successful. Save the token and user data.
+    const user = {
+      id: data.user.id,
+      name: data.user.name,
+      email: data.user.email,
+      // Add the organization from the API response to the user object
+      organization: data.user.organization || null 
+    };
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(user));
+  
+  window.location.href = "index.html";
+  } else {
+  // Login failed. Display the error message from the server.
+  alert(data.message || "Login failed. Please check your credentials.");
+  }
+} catch (error) {
+  console.error("Error:", error);
+  alert("A network error occurred. Please try again later.");
+}
+});
+</script>
+
+</body>
+</html>

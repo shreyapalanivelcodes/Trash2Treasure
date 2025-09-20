@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trash2Treasure - Signup</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* Fixes scrollbar issue and centers content on the page */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  max-height: none;
+  overflow-y: visible;
+  background: none;
+  box-shadow: none;
+}
+  
+/* Styles for the signup form container */
+.auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #2e3c2e;
+  padding: 35px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+.auth-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #d6e8c3;
+}
+.auth-container input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #5c805c;
+  background: #1f2d1f;
+  color: #e0e6d4;
+  transition: all 0.3s ease;
+}
+.auth-container input:focus {
+  outline: none;
+  border-color: #a5d6a7;
+  box-shadow: 0 0 8px rgba(165,214,167,0.4);
+}
+.auth-container button {
+  width: 100%;
+  padding: 12px;
+  background: #81c784;
+  color: #1b2a1b;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.auth-container button:hover {
+  background: #66bb6a;
+  transform: scale(1.03);
+}
+.auth-container p {
+  text-align: center;
+  margin-top: 15px;
+}
+.auth-container .link {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #3a5c3a;
+  color: #e0e6d4;
+  transition: all 0.3s ease;
+}
+.auth-container .link:hover {
+  background: #4f8c4f;
+}
+
+/* Corrected responsive styles for the tip popup */
+@media (max-width: 768px) {
+  #tipPopup {
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>♻️ Trash2Treasure</h1>
+  <nav id="navbar">
+    <a href="index.html" class="main-btn">Home</a>
+    <a href="leaderboard.html" class="main-btn">Leaderboard</a>
+    <a href="profile.html" class="main-btn profile-btn" style="display:none;">My Profile</a>
+    <a href="login.html" class="main-btn login-btn">Login</a>
+    <a href="signup.html" class="main-btn signup-btn">Signup</a>
+    <button class="logout-btn" style="display:none;">Logout</button>
+  </nav>
+</header>
+
+<main>
+  <div class="auth-container">
+    <h1>Signup</h1>
+    <form id="signupForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <!-- Organization field -->
+      <input type="text" id="organization" name="organization" placeholder="Organization (optional)">
+      
+      <button type="submit">Signup</button>
+    </form>
+    <p>Already have an account? <a href="login.html" class="link">Login</a></p>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Trash2Treasure | Building a sustainable future ♻️</p>
+</footer>
+
+<!-- This element is required for the tips.js script -->
+<div id="tipPopup"></div>
+
+<script src="js/tips.js"></script>
+<script src="js/signup.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trash2Treasure - Items</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>♻️ Trash2Treasure</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="upload.html">Upload Waste</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html">Signup</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Uploaded Waste Items 🌱</h2>
+  <div id="itemsContainer">
+    <p>Loading items...</p>
+  </div>
+</main>
+
+<!-- ==================== Tip Pop-up ==================== -->
+<div id="tipPopup" class="popup">
+  <div class="popup-content">
+    <span id="closePopup">&times;</span>
+    <p id="popupMessage">💡 Tip: Reduce plastic waste by carrying a reusable bag!</p>
+  </div>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+// Close popup
+document.getElementById("closePopup").addEventListener("click", () => {
+  document.getElementById("tipPopup").style.display = "none";
+});
+window.addEventListener("load", () => {
+  setTimeout(() => { document.getElementById("tipPopup").style.display = "block"; }, 1500);
+});
+
+// ==================== Load All Items from Backend ====================
+async function loadItems() {
+  const container = document.getElementById("itemsContainer");
+  container.innerHTML = "<p>Loading items...</p>";
+
+  try {
+    const res = await fetch("http://localhost:5000/api/items/all", {
+      headers: token ? { "Authorization": "Bearer " + token } : {}
+    });
+    const items = await res.json();
+
+    if(items.length === 0){
+      container.innerHTML = "<p>No items uploaded yet 🌱</p>";
+      return;
+    }
+
+    let html = '<div class="items-grid">';
+    items.forEach(item => {
+      html += `
+        <div class="item-card">
+          <img src="${window.location.origin}/uploads/${item.filename}" alt="${item.type || "Waste Item"}" />
+          <h3>${item.type || "Waste Item"}</h3>
+          <p>Uploaded by: ${item.userName || "Anonymous"}</p>
+          <p>Date: ${new Date(item.createdAt).toLocaleDateString()}</p>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+  } catch(err){
+    console.error(err);
+    container.innerHTML = "<p>Error loading items ❌</p>";
+  }
+}
+
+window.addEventListener("load", loadItems);
+</script>
+
+</body>
+</html>

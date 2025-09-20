@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Upload Waste - Trash2Treasure</title>
+<link rel="stylesheet" href="/css/style.css?v=1.1">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.6/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<style>
+/* (tumhara existing CSS unchanged rehne diya) */
+body { margin: 0; padding-top: 70px; font-family: "Poppins", sans-serif; }
+.container { max-width: 600px; margin: 0 auto; padding: 0; display: grid; grid-template-columns: 1fr; grid-gap: 20px; justify-items: center; text-align: center; }
+.main-btn { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: #e8f5e9; padding: 12px 20px; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease-in-out; display: inline-block; min-width: 160px; box-shadow: 0 3px 6px rgba(0,0,0,0.25); }
+.main-btn:hover { background: linear-gradient(135deg, #43a047, #2e7d32); transform: scale(1.05); }
+.main-btn:active { transform: scale(0.98); }
+.button-group, .preview-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+.media-wrapper { position: relative; margin: 20px 0; }
+#previewImage, #cameraStream, #capturedImage { max-width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.result-card { margin-top: 15px; padding: 15px; border-radius: 12px; background: #2e7d32; border: 2px solid #e8f5e9; color: #1b5e20; font-weight: bold; font-size: 1rem; display: none; max-width: 500px; text-align: center; }
+.map-container { display: none; margin-top: 30px; background: #2e3c2e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+#map { height: 400px; width: 100%; border-radius: 10px; margin-top: 20px; }
+.map-container h3 { color: #d6e8c3; }
+#navbar .main-btn { min-width: auto; padding: 8px 14px; }
+.message-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: #2e3c2e; color: #d6e8c3; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 200; display: none; text-align: center; }
+.message-box button { margin-top: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>♻️ Trash2Treasure</h1>
+  <nav id="navbar">
+    <a href="/index.html" class="main-btn">Home</a>
+    <a href="/leaderboard.html" class="main-btn">Leaderboard</a>
+    <a href="/profile.html" class="main-btn profile-btn" style="display: none;">My Profile</a>
+    <button class="logout-btn" id="logoutBtn" style="display: none;">Logout</button>
+    <a href="/login.html" class="main-btn login-btn" style="display: none;">Login</a>
+    <a href="/signup.html" class="main-btn signup-btn" style="display: none;">Signup</a>
+  </nav>
+</header>
+
+<main>
+  <section class="container">
+    <h2>Upload Waste Image</h2>
+    <div class="button-group">
+      <label for="fileUpload" class="main-btn">📂 Choose from Device</label>
+      <button id="openCamera" type="button" class="main-btn">📷 Open Camera</button>
+    </div>
+    <input type="file" id="fileUpload" accept="image/*" style="display: none" />
+    <div class="media-wrapper">
+      <video id="cameraStream" autoplay playsinline style="display: none"></video>
+      <canvas id="capturedImage" style="display: none"></canvas>
+      <img id="previewImage" style="display: none" />
+    </div>
+    <div class="preview-actions">
+      <button id="captureBtn" type="button" class="main-btn" style="display: none">📸 Capture Photo</button>
+      <button id="uploadBtn" type="button" class="main-btn" style="display: none">⬆️ Upload & Classify</button>
+    </div>
+    <div id="resultCard" class="result-card"></div>
+  </section>
+
+  <section class="container map-container" id="mapSection">
+    <h3>Find Disposal Centers for Your Waste 🗺️</h3>
+    <p id="mapInfoText"></p>
+    <div id="map"></div>
+  </section>
+</main>
+<div id="tipPopup"></div>
+
+<div id="messageBox" class="message-box">
+  <p id="messageText"></p>
+  <button onclick="document.getElementById('messageBox').style.display='none';" class="main-btn">OK</button>
+</div>
+
+<footer>
+  <p>© 2025 Trash2Treasure | Building a sustainable future ♻️</p>
+</footer>
+
+<script src="js/tips.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  const loginBtn = document.querySelector(".login-btn");
+  const signupBtn = document.querySelector(".signup-btn");
+  const profileBtn = document.querySelector(".profile-btn");
+  const uploadBtn = document.getElementById("uploadBtn");
+
+  uploadBtn.style.display = "none"; // hide by default
+
+  // ==== Navbar Update ====
+  function updateNavbar() {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (token && user) {
+      logoutBtn.style.display = "block";
+      profileBtn.style.display = "block";
+      profileBtn.textContent = `My Profile (${user.name || "User"})`;
+      loginBtn.style.display = "none";
+      signupBtn.style.display = "none";
+    } else {
+      logoutBtn.style.display = "none";
+      profileBtn.style.display = "none";
+      loginBtn.style.display = "block";
+      signupBtn.style.display = "block";
+    }
+  }
+  updateNavbar();
+
+  function showMessage(message) {
+    document.getElementById("messageText").textContent = message;
+    document.getElementById("messageBox").style.display = "block";
+  }
+
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    updateNavbar();
+    window.location.href = "/login.html";
+  });
+
+  // ==== Teachable Machine Model ====
+  const TM_URL = "https://teachablemachine.withgoogle.com/models/NIIHCyM2x/";
+  let model;
+  async function init() {
+    model = await tmImage.load(TM_URL + "model.json", TM_URL + "metadata.json");
+    console.log("Model loaded");
+  }
+  init();
+
+  const fileUpload = document.getElementById("fileUpload");
+  const openCameraBtn = document.getElementById("openCamera");
+  const captureBtn = document.getElementById("captureBtn");
+  const cameraStream = document.getElementById("cameraStream");
+  const capturedImage = document.getElementById("capturedImage");
+  const previewImage = document.getElementById("previewImage");
+  const resultCard = document.getElementById("resultCard");
+  const mapSection = document.getElementById("mapSection");
+  const mapInfoText = document.getElementById("mapInfoText");
+
+  let isCameraActive = false;
+  let capturedFile = null;
+
+  // ==== File Upload Preview ====
+  fileUpload.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      capturedFile = file;
+      previewImage.src = URL.createObjectURL(file);
+      previewImage.style.display = "block";
+      cameraStream.style.display = "none";
+      capturedImage.style.display = "none";
+      uploadBtn.style.display = "block";
+      captureBtn.style.display = "none";
+      resultCard.style.display = "none";
+      mapSection.style.display = "none";
+    }
+  });
+
+  // ==== Camera ====
+  openCameraBtn.addEventListener("click", async () => {
+    if (isCameraActive) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      cameraStream.srcObject = stream;
+      cameraStream.style.display = "block";
+      captureBtn.style.display = "block";
+      uploadBtn.style.display = "none";
+      previewImage.style.display = "none";
+      isCameraActive = true;
+      resultCard.style.display = "none";
+      mapSection.style.display = "none";
+    } catch (err) {
+      showMessage("Unable to access camera. Check browser permissions.");
+    }
+  });
+
+  captureBtn.addEventListener("click", () => {
+    const context = capturedImage.getContext("2d");
+    capturedImage.width = cameraStream.videoWidth;
+    capturedImage.height = cameraStream.videoHeight;
+    context.drawImage(cameraStream, 0, 0, capturedImage.width, capturedImage.height);
+    capturedImage.style.display = "block";
+    cameraStream.style.display = "none";
+    uploadBtn.style.display = "block";
+    captureBtn.style.display = "none";
+    cameraStream.srcObject.getTracks().forEach(track => track.stop());
+    isCameraActive = false;
+
+    capturedImage.toBlob((blob) => {
+      capturedFile = new File([blob], "captured-photo.png", { type: "image/png" });
+    }, "image/png");
+  });
+
+  // ==== Classification ====
+  async function classifyImage(imageFile) {
+    const img = new Image();
+    img.src = URL.createObjectURL(imageFile);
+    await new Promise(resolve => img.onload = resolve);
+    const predictions = await model.predict(img);
+    predictions.sort((a, b) => b.probability - a.probability);
+    return predictions.slice(0, 2);
+  }
+
+  // ==== Upload with Token ====
+  uploadBtn.addEventListener("click", async () => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
+    if (!token || !user) {
+      return showMessage("You are not logged in. Please login to upload.");
+    }
+    if (!capturedFile) {
+      return showMessage("Please choose a file or capture a photo first.");
+    }
+
+    resultCard.style.display = "block";
+    resultCard.textContent = "Classifying image...";
+    resultCard.style.background = "#fff3cd";
+    resultCard.style.border = "2px solid #ff9800";
+    resultCard.style.color = "#333";
+
+    const predictions = await classifyImage(capturedFile);
+    const mainCategory = predictions[0].className;
+    const finalClassificationMessage = `Detected: ${predictions.map(p => `${p.className} (${(p.probability*100).toFixed(1)}%)`).join(", ")}`;
+
+    const formData = new FormData();
+    formData.append("file", capturedFile);
+    formData.append("topCategories", JSON.stringify(predictions));
+    formData.append("type", mainCategory);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/items/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+
+      if (res.ok) {
+        resultCard.innerHTML = finalClassificationMessage + "<br>✅ Upload successful!";
+        resultCard.style.background = "#e8f5e9";
+        resultCard.style.border = "2px solid #2e7d32";
+        resultCard.style.color = "#1b5e20";
+        findDisposalCenters(mainCategory);
+      } else if (res.status === 401) {
+        showMessage("Session expired. Please login again.");
+      } else {
+        const errorData = await res.json();
+        resultCard.innerHTML = finalClassificationMessage + `<br>❌ Upload failed: ${errorData.msg || 'Server error'}.`;
+        resultCard.style.background = "#ffebee";
+        resultCard.style.border = "2px solid #c62828";
+        resultCard.style.color = "#b71c1c";
+      }
+    } catch (err) {
+      console.error(err);
+      resultCard.innerHTML = finalClassificationMessage + "<br>❌ Upload failed: Network error.";
+      resultCard.style.background = "#ffebee";
+      resultCard.style.border = "2px solid #c62828";
+      resultCard.style.color = "#b71c1c";
+    }
+  });
+
+  // ==== Map + Geolocation ====
+  let map, infoWindow, markers = [];
+  window.initMap = function() {
+    map = new google.maps.Map(document.getElementById("map"), { center: { lat:0, lng:0 }, zoom: 12 });
+    infoWindow = new google.maps.InfoWindow();
+  };
+
+  async function findDisposalCenters(itemType) {
+    mapSection.style.display = "block";
+    mapInfoText.textContent = `Finding nearby disposal centers for ${itemType}...`;
+    // Add your Google Maps Places API logic here
+  }
+
+  const googleMapsScript = document.createElement('script');
+  googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCgWdk9SqpS8N_e0Le3EVwTzLb0PfQNDKE&callback=initMap`;
+  googleMapsScript.defer = true;
+  googleMapsScript.async = true;
+  document.head.appendChild(googleMapsScript);
+});
+</script>
+</body>
+</html>
