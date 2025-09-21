@@ -128,7 +128,9 @@
         <nav id="navbar">
             <a href="/index.html" class="main-btn">Home</a>
             <a href="/upload.html" class="main-btn">Upload</a>
+            <a href="/contact.html" class="main-btn">Contact</a>
             <a href="/profile.html" class="main-btn profile-btn" style="display: none;">My Profile</a>
+            <a href="/submissions.html" class="main-btn submissions-btn" style="display: none;">My Submissions</a>
             <button class="logout-btn" id="logoutBtn" style="display: none;">Logout</button>
             <a href="/login.html" class="main-btn login-btn">Login</a>
             <a href="/signup.html" class="main-btn signup-btn">Signup</a>
@@ -179,17 +181,20 @@
         const loginBtn = document.querySelector(".login-btn");
         const signupBtn = document.querySelector(".signup-btn");
         const profileBtn = document.querySelector(".profile-btn");
+        const submissionsBtn = document.querySelector(".submissions-btn");
 
         // ==== Navbar update ====
         if (token && user) {
             logoutBtn.style.display = "block";
             profileBtn.style.display = "block";
+            submissionsBtn.style.display = "block";
             loginBtn.style.display = "none";
             signupBtn.style.display = "none";
             profileBtn.textContent = `My Profile (${user.name})`;
         } else {
             logoutBtn.style.display = "none";
             profileBtn.style.display = "none";
+            submissionsBtn.style.display = "none";
             loginBtn.style.display = "block";
             signupBtn.style.display = "block";
         }

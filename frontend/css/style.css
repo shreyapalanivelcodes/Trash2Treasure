@@ -36,14 +36,26 @@ header {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: rgba(46, 60, 46, 0.85);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  padding: 6px 10px;
+  background: rgba(46, 60, 46, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(129, 199, 132, 0.2);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 8px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 100;
+  transition: all 0.3s ease;
+}
+
+header:hover {
+  background: rgba(46, 60, 46, 0.15);
+  box-shadow: 
+    0 6px 25px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 header h1 {
@@ -60,22 +72,38 @@ nav#navbar {
 nav#navbar .main-btn,
 nav#navbar .logout-btn {
   color: #1b2a1b !important;
-  background: #81c784;
-  padding: 6px 12px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #81c784, #66bb6a);
+  padding: 8px 16px;
+  border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.9rem;
   min-width: auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 15px rgba(129, 199, 132, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateZ(0);
 }
 
 nav#navbar .main-btn:hover,
 nav#navbar .logout-btn:hover {
-  background: #66bb6a;
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #66bb6a, #4caf50);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 25px rgba(129, 199, 132, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(129, 199, 132, 0.3);
+}
+
+nav#navbar .main-btn:active,
+nav#navbar .logout-btn:active {
+  transform: translateY(-1px) scale(0.98);
+  transition: all 0.1s;
 }
 
 /* ==================== Footer ==================== */
@@ -84,11 +112,210 @@ footer {
   bottom: 0;
   width: 100%;
   text-align: center;
-  padding: 10px;
-  background-color: rgba(46, 60, 46, 0.85);
+  padding: 12px;
+  background: rgba(46, 60, 46, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(129, 199, 132, 0.2);
   color: #d6e8c3;
   z-index: 10;
   font-size: 0.9rem;
+  box-shadow: 
+    0 -4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== Custom Scrollbars ==================== */
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(27, 42, 27, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(129, 199, 132, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #81c784, #66bb6a);
+  border-radius: 10px;
+  border: 2px solid rgba(27, 42, 27, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #66bb6a, #4caf50);
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3);
+  transform: scale(1.05);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #4caf50, #388e3c);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(27, 42, 27, 0.3);
+}
+
+/* Thin scrollbar for smaller elements */
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #81c784;
+  border-radius: 6px;
+  border: 1px solid rgba(27, 42, 27, 0.2);
+}
+
+.thin-scroll::-webkit-scrollbar-thumb:hover {
+  background: #66bb6a;
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #81c784 rgba(27, 42, 27, 0.3);
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ==================== Stunning Visual Effects ==================== */
+
+/* Glassmorphism effect for containers */
+.glass-effect {
+  background: rgba(46, 60, 46, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(129, 199, 132, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover animations for buttons */
+.main-btn, .logout-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.main-btn::before, .logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.main-btn:hover::before, .logout-btn:hover::before {
+  left: 100%;
+}
+
+/* Floating animation for cards */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.item-card:hover {
+  animation: float 2s ease-in-out infinite;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(129, 199, 132, 0.3);
+}
+
+/* Pulse animation for important elements */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(129, 199, 132, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(129, 199, 132, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(129, 199, 132, 0); }
+}
+
+.pulse-effect {
+  animation: pulse 2s infinite;
+}
+
+/* Glow effects */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(129, 199, 132, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 30px rgba(129, 199, 132, 0.8);
+}
+
+/* Text shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #d6e8c3 25%, #81c784 50%, #d6e8c3 75%);
+  background-size: 200px 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 3s infinite;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  border: 3px solid rgba(129, 199, 132, 0.3);
+  border-top: 3px solid #81c784;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+/* Ripple effect for button clicks */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple-effect:active::before {
+  width: 300px;
+  height: 300px;
 }
 
 /* ==================== Tip Popup ==================== */
@@ -116,11 +343,26 @@ main {
   max-width: 600px;
   margin: auto;
   padding: 30px;
-  background-color: rgba(46, 60, 46, 0.9);
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  background: rgba(46, 60, 46, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(129, 199, 132, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 50px rgba(129, 199, 132, 0.1);
   overflow-y: auto;
-  max-height: calc(100vh - 120px); /* Sets a max-height to enable scrolling */
+  max-height: calc(100vh - 120px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+main:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 60px rgba(129, 199, 132, 0.2);
+  transform: translateY(-2px);
 }
 
 /* --- */
@@ -258,6 +500,26 @@ main {
   max-height: 400px; /* Adjust this value as needed for the height of the table area */
   border-radius: 10px;
   background: rgba(46, 60, 46, 0.9);
+}
+
+/* Apply beautiful scrollbar to leaderboard */
+.leaderboard-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.leaderboard-content::-webkit-scrollbar-track {
+  background: rgba(27, 42, 27, 0.2);
+  border-radius: 4px;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #81c784, #66bb6a);
+  border-radius: 4px;
+  border: 1px solid rgba(27, 42, 27, 0.1);
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #66bb6a, #4caf50);
 }
 
 .leaderboard table {

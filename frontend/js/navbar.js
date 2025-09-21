@@ -18,6 +18,8 @@ function updateNavbar() {
                 <a href="profile.html">Profile (${user.name})</a>
                 <a href="upload.html">Upload Waste</a>
                 <a href="leaderboard.html">Leaderboard</a>
+                <a href="contact.html">Contact</a>
+                <a href="submissions.html">My Submissions</a>
                 <button id="logoutBtn">Logout</button>
             `;
             document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -31,6 +33,7 @@ function updateNavbar() {
                 <a href="login.html">Login</a>
                 <a href="signup.html">Signup</a>
                 <a href="leaderboard.html">Leaderboard</a>
+                <a href="contact.html">Contact</a>
             `;
         }
     }

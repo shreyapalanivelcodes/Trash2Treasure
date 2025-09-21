@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <style>
         /* Page-specific styles */
-        body {
-            padding-top: 70px;
-        }
+        body { padding-top: 70px; }
 
         header {
             background: rgba(46, 60, 46, 0.85);
@@ -25,13 +23,9 @@
             align-items: center;
         }
 
-        header h1 {
-            font-size: 1.8rem;
-            color: #d6e8c3;
-        }
+        header h1 { font-size: 1.8rem; color: #d6e8c3; }
 
-        nav#navbar a.main-btn,
-        .logout-btn {
+        nav#navbar a.main-btn, .logout-btn {
             color: #1b2a1b !important;
             background: #81c784;
             padding: 8px 15px;
@@ -44,25 +38,12 @@
             font-size: 1rem;
         }
 
-        nav#navbar a.main-btn:hover,
-        .logout-btn:hover {
-            background: #66bb6a;
-            transform: scale(1.05);
-        }
+        nav#navbar a.main-btn:hover, .logout-btn:hover { background: #66bb6a; transform: scale(1.05); }
 
-        nav#navbar {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
+        nav#navbar { display: flex; gap: 15px; align-items: center; }
 
-        h2 {
-            margin-top: 0;
-            border-bottom: 1px solid #4f8c4f;
-            padding-bottom: 5px;
-        }
+        h2 { margin-top: 0; border-bottom: 1px solid #4f8c4f; padding-bottom: 5px; }
 
-        /* ===== Gallery Grid (Side-by-side layout) ===== */
         .items-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -82,10 +63,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .item-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
+        .item-card:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
 
         .item-card img {
             width: 100%;
@@ -93,10 +71,8 @@
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 10px;
-        }
-
-        .categories {
-            margin-top: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .categories span {
@@ -116,72 +92,108 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
             max-width: 1000px;
         }
-
-        @media (max-width: 768px) {
-            .items-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- ================= Header ================= -->
+    <!-- Header -->
     <header>
         <h1>♻️ Trash2Treasure</h1>
         <nav id="navbar">
             <a href="index.html" class="main-btn">Home</a>
+            <a href="upload.html" class="main-btn">Upload</a>
             <a href="leaderboard.html" class="main-btn">Leaderboard</a>
-            <a href="upload.html" class="main-btn">Upload Waste</a>
+            <a href="contact.html" class="main-btn">Contact</a>
+            <a href="profile.html" class="main-btn">My Profile</a>
+            <a href="submissions.html" class="main-btn">My Submissions</a>
             <button class="logout-btn" id="logoutBtn">Logout</button>
+            <button id="requestAdminBtn" class="main-btn">Request Admin Access</button>
+            <p id="requestStatus"></p>
         </nav>
     </header>
 
-    <!-- ================= Main Content ================= -->
+    <!-- Main Content -->
     <main>
-        <!-- Profile Info -->
         <section class="container" id="profileInfo">
             <h2>Profile Info</h2>
             <p><strong>Name:</strong> <span id="userName"></span></p>
             <p><strong>Email:</strong> <span id="userEmail"></span></p>
         </section>
 
-        <!-- Uploaded Items -->
         <section class="container">
             <h2>Your Uploaded Items 🌱</h2>
             <div id="userItems" class="items-grid"></div>
         </section>
     </main>
 
-    <!-- ================= Tips Popup ================= -->
-    <div id="tipPopup"></div>
-
-    <!-- ================= Footer ================= -->
+    <!-- Footer -->
     <footer>
         <p>© 2025 Trash2Treasure | Building a sustainable future ♻️</p>
     </footer>
 
-    <!-- ================= Scripts ================= -->
+    <!-- Scripts -->
     <script src="/js/tips.js"></script>
     <script>
-        // ===== USER INFO & LOGOUT =====
+        // ===== USER AUTH CHECK =====
         const token = localStorage.getItem("token");
-        const user = JSON.parse(localStorage.getItem("user"));
+        const user = JSON.parse(localStorage.getItem("user") || "null");
 
         if (!token || !user) {
             window.location.href = "login.html";
         } else {
             document.getElementById("userName").textContent = user.name;
             document.getElementById("userEmail").textContent = user.email || "N/A";
+
+            // Show Admin Dashboard if admin
+            if (user.isAdmin) {
+                if (!document.getElementById("adminBtn")) {
+                    const adminBtn = document.createElement("a");
+                    adminBtn.href = "admin.html";
+                    adminBtn.className = "main-btn";
+                    adminBtn.id = "adminBtn";
+                    adminBtn.textContent = "Admin Dashboard";
+                    document.getElementById("navbar").appendChild(adminBtn);
+                }
+            }
         }
 
-        document.getElementById("logoutBtn").addEventListener("click", () => {
+        // Logout
+        const logoutBtn = document.getElementById("logoutBtn");
+        logoutBtn.addEventListener("click", () => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             window.location.href = "login.html";
         });
 
-        // ===== Load Uploaded Items =====
+        // ===== REQUEST ADMIN ACCESS =====
+        const requestBtn = document.getElementById("requestAdminBtn");
+        const statusText = document.getElementById("requestStatus");
+
+        if (requestBtn) {
+            requestBtn.addEventListener("click", async () => {
+                if (!user || !token) return alert("Login first!");
+
+                try {
+                    const res = await fetch("/api/admin/request-admin", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ userId: user.id })
+                    });
+
+                    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+                    const data = await res.json();
+                    statusText.textContent = data.msg || "Request sent!";
+                } catch (err) {
+                    console.error(err);
+                    statusText.textContent = "Failed to send request ❌";
+                }
+            });
+        }
+
+        // ===== LOAD USER ITEMS =====
         async function loadUserItems() {
             const container = document.getElementById("userItems");
             container.innerHTML = "<p>Loading...</p>";
@@ -190,11 +202,15 @@
                 const res = await fetch("/api/items/user", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
-                if (res.status === 401) return window.location.href = "login.html";
-                if (!res.ok) throw new Error("Failed to fetch");
+
+                if (!res.ok) {
+                    container.innerHTML = `<p>Failed to load items (Status: ${res.status})</p>`;
+                    return;
+                }
 
                 const items = await res.json();
                 container.innerHTML = "";
+
                 if (!Array.isArray(items) || !items.length) {
                     container.innerHTML = "<p>No uploads yet 🌱</p>";
                     return;
@@ -206,11 +222,19 @@
 
                     // Image
                     const img = document.createElement("img");
-                    img.src = item.filename
-                        ? `/uploads/${item.filename}`
-                        : "https://placehold.co/250x180/4f8c4f/ffffff?text=No+Image";
+                    img.alt = item.type || "Uploaded item";
 
-                    // Type
+                    if (item.filename) {
+                        img.src = `/uploads/${item.filename}`;
+                        img.onerror = function() {
+                            this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='180'%3E%3Crect width='250' height='180' fill='%23555'/%3E%3Ctext x='125' y='90' font-size='14' fill='%2381c784' text-anchor='middle'%3EImage not found%3C/text%3E%3C/svg%3E";
+                            this.style.border = '2px dashed #81c784';
+                        };
+                    } else {
+                        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='180'%3E%3Crect width='250' height='180' fill='%23555' stroke='%2381c784' stroke-width='2' stroke-dasharray='5,5' rx='8'/%3E%3Ctext x='125' y='90' font-size='14' fill='%2381c784' text-anchor='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
+                    }
+
+                    // Title
                     const title = document.createElement("h4");
                     title.textContent = item.type || "Unknown";
 
@@ -219,11 +243,9 @@
                     categories.className = "categories";
                     if (item.topCategories && item.topCategories.length) {
                         item.topCategories.forEach(cat => {
-                            const name = cat.name || cat.className || "Unknown";
-                            const perc = (cat.percentage !== undefined)
-                                ? cat.percentage
-                                : (cat.probability !== undefined ? (cat.probability * 100).toFixed(1) : "0");
                             const span = document.createElement("span");
+                            const name = cat.name || cat.className || "Unknown";
+                            const perc = cat.percentage ?? ((cat.probability ?? 0) * 100).toFixed(1);
                             span.textContent = `${name} - ${perc}%`;
                             categories.appendChild(span);
                         });
